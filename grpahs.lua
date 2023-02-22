@@ -7,7 +7,7 @@ lookup = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1}
 cardRemaining = {}
 gPosition = {}
 gDestination = {}
-gMovementSpeed = 4
+gMovementSpeed = 144
 gPath = {}
 
 -- define the nodes of the graph
@@ -76,6 +76,7 @@ function calculate_path(Card1, Card2)
             io.write(" -> ")
         end
     end
+    print(" ")
     -- This is for debugging only
 end
 
@@ -114,15 +115,28 @@ function find_shortest_path(graph, start, goal)
     return {}                                               -- if no path is found, return an empty table
 end
 
+function shuffle(t)
+    local tbl = {}
+    for i = 1, #t do
+        table.insert(tbl, t[i])
+    end
+    for i = #t, 2, -1 do
+        local j = math.random(i)
+        tbl[i], tbl[j] = tbl[j], tbl[i]
+    end
+    return tbl
+end
+
 function getNewGDestination()
     if(#cardRemaining == 0) then
-        cardRemaining = {table.unpack(lookup)}
+        cardRemaining = {table.unpack(shuffle(lookup))}
         print("Shuffled Deck")
     end
-
-    local frank = table.remove(cardRemaining)
-    print("getNewGDest Return is: " .. frank.name)
-    return frank
+    local newDestination = table.remove(cardRemaining)
+    if(newDestination == gPosition) then
+        newDestination = table.remove(cardRemaining)
+    end
+    return newDestination
 end
 
 function cycleThrough(movement)
