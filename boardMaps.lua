@@ -2,10 +2,10 @@
 -- Odd Graphs Cycle through adjacent nodes, WEST, NORTH, EAST, SOUTH
 -- Even Graphs Cycle through adjacent nodes, EAST, SOUTH, WEST, NORTH
 
-node1 = {["West"]= nil,["North"]= nil,["East"]= nil,["South"]= nil,}
+node1 = {["W"]= nil,["N"]= nil,["E"]= nil,["S"]= nil,}
 gameMaps = {
     {
-        {["W"]= nil,["N"]= nil,["E"]= 5,["S"]= nil,}, --Position 1
+        {["W"]= nil,["N"]= nil,["E"]= 2,["S"]= nil,}, --Position 1
         {["W"]= 1,["N"]= 6,["E"]= 3,["S"]= nil,}, --Position 2
         {["W"]= 2,["N"]= nil,["E"]= 4,["S"]= nil,}, --Position 3
         {["W"]= nil,["N"]= nil,["E"]= 3,["S"]= nil,}, --Position 4
