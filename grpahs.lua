@@ -1,5 +1,6 @@
 -- Lua file that contains all board layouts
-local boardMaps = require("boardMaps")
+require("boardMaps")
+require("guards")
 
 -- Basic board layout information
 A1 = {slot=13, x=0, y=3} A2 = {slot=9, x=0, y=2} A3 = {slot=5, x=0, y=1} A4 = {slot=1, x=0, y=0}
@@ -13,25 +14,6 @@ gPosition = {}
 gDestination = {}
 gMovementSpeed = 6
 gPath = {}
-
-
-Guard = {}
-
--- Define the constructor function for the Person class
-function Guard:new(floor, speed)
-    local guard = {
-        floor = floor,
-        speed = speed
-    }
-    setmetatable(guard, self)
-    self.__index = self
-    return guard
-end
-
--- Define a method for the Person class
-function Guard:sayHello()
-    print("Hello, my name is " .. self.floor)
-end
 
 -- Create an instance of the Person class
 local guard1 = Guard:new(2, 30)
@@ -166,7 +148,7 @@ function guardCheckRoom(myRoom)
     print("Checking Room" .. myRoom)
 end
 
-calculate_maps(boardMaps[1])
+calculate_maps(getMap())
 gPosition = getNewGDestination()
 gDestination = getNewGDestination()
 calculate_path(gPosition, gDestination)

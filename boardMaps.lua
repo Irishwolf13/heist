@@ -61,4 +61,6 @@ gameMaps = {
     -- }
 }
 
-return gameMaps
+function getMap()
+    return gameMaps[1]
+end
