@@ -7,12 +7,37 @@ B1 = {slot=14, x=1, y=3} B2 = {slot=10, x=1, y=2} B3 = {slot=6, x=1, y=1} B4 = {
 C1 = {slot=15, x=2, y=3} C2 = {slot=11, x=2, y=2} C3 = {slot=7, x=2, y=1} C4 = {slot=3, x=2, y=0}
 D1 = {slot=16, x=3, y=3} D2 = {slot=12, x=3, y=2} D3 = {slot=8, x=3, y=1} D4 = {slot=4, x=3, y=0}
 
-lookup = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1}
-cardRemaining = {}
+gLocations = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1}
+gLocationsRemaining = {}
 gPosition = {}
 gDestination = {}
-gMovementSpeed = 106
+gMovementSpeed = 6
 gPath = {}
+
+
+Guard = {}
+
+-- Define the constructor function for the Person class
+function Guard:new(floor, speed)
+    local guard = {
+        floor = floor,
+        speed = speed
+    }
+    setmetatable(guard, self)
+    self.__index = self
+    return guard
+end
+
+-- Define a method for the Person class
+function Guard:sayHello()
+    print("Hello, my name is " .. self.floor)
+end
+
+-- Create an instance of the Person class
+local guard1 = Guard:new(2, 30)
+
+-- Call the sayHello method on the person1 object
+guard1:sayHello()
 
 -- Kinda need two graphs for the 'always clockwise' movement I need for the guards
 local graph1 = {}
@@ -51,22 +76,12 @@ function calculate_path(Card1, Card2)
     local start_node = Card1.slot
     local end_node = Card2.slot
 
-    if Card1.x >= Card2.x and Card1.y >= Card2.y then
+    if (Card1.x >= Card2.x and Card1.y >= Card2.y) or (Card1.x <= Card2.x and Card1.y > Card2.y) then
         print("I took Path2")
         gPath = find_shortest_path(graph2, start_node, end_node)
     else
-        if (Card1.x <= Card2.x and Card1.y > Card2.y) then
-            print("I took path2")
-            gPath = find_shortest_path(graph2, start_node, end_node)
-        else
-            print("I took Path1")
-            gPath = find_shortest_path(graph1, start_node, end_node)
-        end
-    end
-
-    -- Not sure I need this code here...
-    if #gPath == 0 then
-        print("No path found from node "..start_node.." to node "..end_node)
+        print("I took Path1")
+        gPath = find_shortest_path(graph1, start_node, end_node)
     end
 
     -- This is for debugging only
@@ -93,16 +108,6 @@ function find_shortest_path(graph, start, goal)
 
         if node == goal then                                -- if we've reached the goal, return the path
             return path
-        else
-        -- This is for debugging only
-            -- for i, node in ipairs(path) do
-            --     io.write(node)
-            --     if i ~= #path then
-            --         io.write(" -> ")
-            --     end
-            -- end
-            -- print(" ")
-        -- This is for debugging only
         end
 
         for _, neighbor in ipairs(graph[node][2]) do        -- Grabs the neighbors for the current node
@@ -130,13 +135,13 @@ function shuffle(t)
 end
 
 function getNewGDestination()
-    if(#cardRemaining == 0) then
-        cardRemaining = {table.unpack(shuffle(lookup))}
+    if(#gLocationsRemaining == 0) then
+        gLocationsRemaining = {table.unpack(shuffle(gLocations))}
         print("Shuffled Deck")
     end
-    local newDestination = table.remove(cardRemaining)
+    local newDestination = table.remove(gLocationsRemaining)
     if(newDestination == gPosition) then
-        newDestination = table.remove(cardRemaining)
+        newDestination = table.remove(gLocationsRemaining)
     end
     return newDestination
 end
@@ -145,7 +150,7 @@ function cycleThrough(movement)
     for i = 1, movement do
         table.remove(gPath, 1)
         -- MOVE GAURD HERE
-        gPosition = lookup[gPath[1]]                        -- SET CURRENT POSITION HERE
+        gPosition = gLocations[gPath[1]]                        -- SET CURRENT POSITION HERE
         if(#gPath == 1) then                                -- Call function to get new destination from current postion
         -- GET SECOND ARGUMENT FROM CARDS IN GAME... D4 is placeholder
             -- Get new potition from lookup array, if random positioins doesn't = gPosition
