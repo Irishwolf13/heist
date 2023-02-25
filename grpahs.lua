@@ -2,34 +2,21 @@
 local boardMaps = require("boardMaps")
 
 -- Basic board layout information
-A1 = {slot=13, x=0, y=3, ['Room'] = '', ['Characters'] = {}, }
-A2 = {slot=9, x=0, y=2}
-A3 = {slot=5, x=0, y=1}
-A4 = {slot=1, x=0, y=0}
-B1 = {slot=14, x=1, y=3}
-B2 = {slot=10, x=1, y=2}
-B3 = {slot=6, x=1, y=1}
-B4 = {slot=2, x=1, y=0}
-C1 = {slot=15, x=2, y=3}
-C2 = {slot=11, x=2, y=2}
-C3 = {slot=7, x=2, y=1}
-C4 = {slot=3, x=2, y=0}
-D1 = {slot=16, x=3, y=3}
-D2 = {slot=12, x=3, y=2}
-D3 = {slot=8, x=3, y=1}
-D4 = {slot=4, x=3, y=0}
+A1 = {slot=13, x=0, y=3} A2 = {slot=9, x=0, y=2} A3 = {slot=5, x=0, y=1} A4 = {slot=1, x=0, y=0}
+B1 = {slot=14, x=1, y=3} B2 = {slot=10, x=1, y=2} B3 = {slot=6, x=1, y=1} B4 = {slot=2, x=1, y=0}
+C1 = {slot=15, x=2, y=3} C2 = {slot=11, x=2, y=2} C3 = {slot=7, x=2, y=1} C4 = {slot=3, x=2, y=0}
+D1 = {slot=16, x=3, y=3} D2 = {slot=12, x=3, y=2} D3 = {slot=8, x=3, y=1} D4 = {slot=4, x=3, y=0}
 
--- Global variables I'm going to need...
-floor1_deck = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1}
-floor1_remaining = {}
-gOnePosition = {}
-gOneDestination = {}
-gOneMovementSpeed = 6
-gOnePath = {}
+lookup = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1}
+cardRemaining = {}
+gPosition = {}
+gDestination = {}
+gMovementSpeed = 106
+gPath = {}
 
 -- Kinda need two graphs for the 'always clockwise' movement I need for the guards
-floorOneA = {}
-floorOneB = {}
+local graph1 = {}
+local graph2 = {}
 function calculate_maps(myGraph)
     myPos1 = 0
     for _, value in ipairs(myGraph) do
@@ -42,7 +29,7 @@ function calculate_maps(myGraph)
         if value.E ~= nil then table.insert(insideArray1, value.E) end
         if value.S ~= nil then table.insert(insideArray1, value.S) end
         table.insert(pushArray1, insideArray1)
-        table.insert(floorOneA, pushArray1)
+        table.insert(graph1, pushArray1)
     end
 
     myPos2 = 0
@@ -56,31 +43,40 @@ function calculate_maps(myGraph)
         if value.W ~= nil then table.insert(insideArray2, value.W) end
         if value.N ~= nil then table.insert(insideArray2, value.N) end
         table.insert(pushArray2, insideArray2)
-        table.insert(floorOneB, pushArray2)
+        table.insert(graph2, pushArray2)
     end
 end
 
-function calculate_path(Card1, Card2, pathA, pathB)
+function calculate_path(Card1, Card2)
     local start_node = Card1.slot
     local end_node = Card2.slot
-    -- Choose which path is the correct path given the current position
-    if Card1.x >= Card2.x and Card1.y >= Card2.y or Card1.x <= Card2.x and Card1.y > Card2.y then
+
+    if Card1.x >= Card2.x and Card1.y >= Card2.y then
         print("I took Path2")
-        gOnePath = find_shortest_path(pathB, start_node, end_node)
+        gPath = find_shortest_path(graph2, start_node, end_node)
     else
-        print("I took Path1")
-        gOnePath = find_shortest_path(pathA, start_node, end_node)
+        if (Card1.x <= Card2.x and Card1.y > Card2.y) then
+            print("I took path2")
+            gPath = find_shortest_path(graph2, start_node, end_node)
+        else
+            print("I took Path1")
+            gPath = find_shortest_path(graph1, start_node, end_node)
+        end
     end
-    
+
+    -- Not sure I need this code here...
+    if #gPath == 0 then
+        print("No path found from node "..start_node.." to node "..end_node)
+    end
 
     -- This is for debugging only
-        -- for i, node in ipairs(gPath) do
-        --     io.write(node)
-        --     if i ~= #gPath then
-        --         io.write(" -> ")
-        --     end
-        -- end
-        -- print(" ")
+        for i, node in ipairs(gPath) do
+            io.write(node)
+            if i ~= #gPath then
+                io.write(" -> ")
+            end
+        end
+        print(" ")
     -- This is for debugging only
 end
 
@@ -97,6 +93,16 @@ function find_shortest_path(graph, start, goal)
 
         if node == goal then                                -- if we've reached the goal, return the path
             return path
+        else
+        -- This is for debugging only
+            -- for i, node in ipairs(path) do
+            --     io.write(node)
+            --     if i ~= #path then
+            --         io.write(" -> ")
+            --     end
+            -- end
+            -- print(" ")
+        -- This is for debugging only
         end
 
         for _, neighbor in ipairs(graph[node][2]) do        -- Grabs the neighbors for the current node
@@ -111,41 +117,40 @@ function find_shortest_path(graph, start, goal)
     return {}                                               -- if no path is found, return an empty table
 end
 
-function shuffle_deck(myDeck)
-    local newDeck = {}
-    for i = 1, #myDeck do
-        table.insert(newDeck, myDeck[i])
+function shuffle(t)
+    local tbl = {}
+    for i = 1, #t do
+        table.insert(tbl, t[i])
     end
-    for i = #myDeck, 2, -1 do
+    for i = #t, 2, -1 do
         local j = math.random(i)
-        newDeck[i], newDeck[j] = newDeck[j], newDeck[i]
+        tbl[i], tbl[j] = tbl[j], tbl[i]
     end
-    return newDeck
+    return tbl
 end
 
-function getNewGDestination(floor_deck, floor_remaining, gaurd_position)
-    if(#floor_remaining == 0) then
-        floor_remaining = {table.unpack(shuffle_deck(floor_deck))}
+function getNewGDestination()
+    if(#cardRemaining == 0) then
+        cardRemaining = {table.unpack(shuffle(lookup))}
         print("Shuffled Deck")
     end
-    local newDestination = table.remove(floor_remaining)
-    if(newDestination == gaurd_position) then
-        newDestination = table.remove(floor_remaining)
+    local newDestination = table.remove(cardRemaining)
+    if(newDestination == gPosition) then
+        newDestination = table.remove(cardRemaining)
     end
     return newDestination
 end
 
-function cycleThrough(movement_speed, g_path, g_position, floor_deck, floor_remaining, g_destination, floorA, floorB)
-    -- gOnePosition gOnePath floor1_deck gOneDestination
-    for i = 1, movement_speed do
-        table.remove(g_path, 1)
+function cycleThrough(movement)
+    for i = 1, movement do
+        table.remove(gPath, 1)
         -- MOVE GAURD HERE
-        g_position = floor_deck[g_path[1]]                        -- SET CURRENT POSITION HERE
-        if(#g_path == 1) then                                -- Call function to get new destination from current postion
-
+        gPosition = lookup[gPath[1]]                        -- SET CURRENT POSITION HERE
+        if(#gPath == 1) then                                -- Call function to get new destination from current postion
+        -- GET SECOND ARGUMENT FROM CARDS IN GAME... D4 is placeholder
             -- Get new potition from lookup array, if random positioins doesn't = gPosition
-            g_destination = getNewGDestination(floor_deck, floor_remaining, g_position)
-            calculate_path(g_position, g_destination, floorA, floorB)
+            gDestination = getNewGDestination()
+            calculate_path(gPosition, gDestination)
         end
     end
     -- print(" This is my Last Position: " .. gPosition.slot)
@@ -157,7 +162,7 @@ function guardCheckRoom(myRoom)
 end
 
 calculate_maps(boardMaps[1])
-gOnePosition = getNewGDestination(floor1_deck, floor1_remaining, gOnePosition)
-gOneDestination = getNewGDestination(floor1_deck, floor1_remaining, gOnePosition)
-calculate_path(gOnePosition, gOneDestination, floorOneA, floorOneB)
-cycleThrough(gOneMovementSpeed, gOnePath, gOnePosition, floor1_deck, floor1_remaining, gOneDestination, floorOneA, floorOneB)
+gPosition = getNewGDestination()
+gDestination = getNewGDestination()
+calculate_path(gPosition, gDestination)
+cycleThrough(gMovementSpeed)
