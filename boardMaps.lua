@@ -1,6 +1,19 @@
 -- Graphs are used in pairs to mantain clockwise pathing
 -- Odd Graphs Cycle through adjacent nodes, WEST, NORTH, EAST, SOUTH
 -- Even Graphs Cycle through adjacent nodes, EAST, SOUTH, WEST, NORTH
+
+-- Basic board layout information
+BasicBoard ={
+{slot=1, x=0, y=3}, {slot=2, x=0, y=2}, {slot=3, x=0, y=1}, {slot=4, x=0, y=0},
+{slot=5, x=1, y=3}, {slot=6, x=1, y=2}, {slot=7, x=1, y=1}, {slot=8, x=1, y=0},
+{slot=9, x=2, y=3}, {slot=10, x=2, y=2}, {slot=11, x=2, y=1}, {slot=12, x=2, y=0},
+{slot=13, x=3, y=3}, {slot=14, x=3, y=2}, {slot=15, x=3, y=1}, {slot=16, x=3, y=0}
+}
+
+function getMap(level)
+    return gameMaps[level]
+end
+
 function calculate_maps(myGraph)
     local myPos1 = 0
     local map1 = {}
@@ -37,28 +50,24 @@ function calculate_maps(myGraph)
     return maps
 end
 
-function getMap(level)
-    return gameMaps[level]
-end
-
 gameMaps = {
     {
-        {["W"]= nil,["N"]= nil,["E"]= 2,["S"]= nil,}, --Position 1
-        {["W"]= 1,["N"]= 6,["E"]= 3,["S"]= nil,}, --Position 2
-        {["W"]= 2,["N"]= nil,["E"]= 4,["S"]= nil,}, --Position 3
-        {["W"]= nil,["N"]= nil,["E"]= 3,["S"]= nil,}, --Position 4
-        {["W"]= nil,["N"]= 9,["E"]= 6,["S"]= nil,}, --Position 5
-        {["W"]= 5,["N"]= nil,["E"]= 7,["S"]= 2,}, --Position 6
-        {["W"]= 6,["N"]= 11,["E"]= 8,["S"]= nil,}, --Position 7
-        {["W"]= 7,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 8
-        {["W"]= nil,["N"]= 13,["E"]= 10,["S"]= 5,}, --Position 9
-        {["W"]= 9,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 10
-        {["W"]= nil,["N"]= 15,["E"]= nil,["S"]= 7,}, --Position 11
-        {["W"]= nil,["N"]= 16,["E"]= nil,["S"]= nil,}, --Position 12
-        {["W"]= nil,["N"]= nil,["E"]= 14,["S"]= 9,}, --Position 13
-        {["W"]= 13,["N"]= nil,["E"]= 15,["S"]= nil,}, --Position 14
-        {["W"]= 14,["N"]= nil,["E"]= 16,["S"]= 11,}, --Position 15
-        {["W"]= 15,["N"]= nil,["E"]= nil,["S"]= 12,}, --Position 16
+        {["W"]= nil,["N"]= nil,["E"]= 5,["S"]= 2,}, --Position 1
+        {["W"]= nil,["N"]= 1,["E"]= 6,["S"]= 3,}, --Position 2
+        {["W"]= nil,["N"]= 2,["E"]= 7,["S"]= nil,}, --Position 3
+        {["W"]= nil,["N"]= nil,["E"]= 8,["S"]= nil,}, --Position 4
+        {["W"]= 1,["N"]= nil,["E"]= 9,["S"]= nil,}, --Position 5
+        {["W"]= 2,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 6
+        {["W"]= 3,["N"]= nil,["E"]= 11,["S"]= 8,}, --Position 7
+        {["W"]= 4,["N"]= 7,["E"]= 12,["S"]= nil,}, --Position 8
+        {["W"]= 5,["N"]= nil,["E"]= 13,["S"]= 10,}, --Position 9
+        {["W"]= nil,["N"]= 9,["E"]= nil,["S"]= 11,}, --Position 10
+        {["W"]= 7,["N"]= 10,["E"]= 15,["S"]= nil,}, --Position 11
+        {["W"]= 8,["N"]= nil,["E"]= 16,["S"]= nil,}, --Position 12
+        {["W"]= 9,["N"]= nil,["E"]= nil,["S"]= 14,}, --Position 13
+        {["W"]= nil,["N"]= 13,["E"]= nil,["S"]= nil,}, --Position 14
+        {["W"]= 11,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 15
+        {["W"]= 12,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 16
     },
     {
         {["W"]= nil,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 1

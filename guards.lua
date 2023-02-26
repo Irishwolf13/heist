@@ -10,10 +10,18 @@ function Guard:new(floor, graph)
         position = {},
         destination = {},
         path = {},
-        mapLookUp = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1},
-        mapLocations = {A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4, D1, D2, D3, D4},
+        mapLookUp = {},
+        mapLocations = {},
         mapLocationsRemaining = {}
     }
+    -- Sets static board for level
+    for i, element in ipairs(BasicBoard) do
+        table.insert(guard.mapLookUp, element)
+    end
+    -- Sets array that we pull from as game goes on
+    for i, element in ipairs(BasicBoard) do
+        table.insert(guard.mapLocations, element)
+    end
     setmetatable(guard, self)
     self.__index = self
     return guard
@@ -26,7 +34,7 @@ function Guard:setPosition()
             self:shuffle()
         end
         self.position = table.remove(self.mapLocationsRemaining, 1)
-        print("My Position: "..self.position.slot)
+        -- print("My Position: "..self.position.slot)
     end
 end
 
@@ -36,7 +44,7 @@ function Guard:setDestination()
         self:shuffle()
     end
     self.destination = table.remove(self.mapLocationsRemaining, 1)
-    print("My Desitination: " .. self.destination.slot)
+    -- print("My Desitination: " .. self.destination.slot)
 end
 
 -- Sets the current path of guard to follow when moveGuard is called
@@ -96,12 +104,11 @@ function Guard:moveGuard()
         if(#self.path == 1) then                            -- If Position and new destination are the same, get next destination
             self:setDestination()
             self:setGuardPath()
-            print("My Speed is " .. self.speed)
         end
     end
-    print('I am on Floor: ' .. self.floor)
-    print('My Current Position is: ' .. self.position.slot)
-    print('My Current Destination is: ' .. self.destination.slot)
+    -- print('I am on Floor: ' .. self.floor)
+    -- print('My Current Position is: ' .. self.position.slot)
+    -- print('My Current Destination is: ' .. self.destination.slot)
 end
 
 -- Shuffles the deck of guard movements
@@ -119,7 +126,7 @@ function Guard:shuffle()
     for _, obj in ipairs(myTable) do
         table.insert(self.mapLocationsRemaining, obj)
     end
-    print("Shuffled")
+    -- print("Shuffled")
 end
 
 -- Searches room for characters
