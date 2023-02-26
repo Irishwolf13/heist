@@ -1,11 +1,10 @@
 -- Graphs are used in pairs to mantain clockwise pathing
 -- Odd Graphs Cycle through adjacent nodes, WEST, NORTH, EAST, SOUTH
 -- Even Graphs Cycle through adjacent nodes, EAST, SOUTH, WEST, NORTH
-graph1 = {}
-graph2 = {}
-
 function calculate_maps(myGraph)
     local myPos1 = 0
+    local map1 = {}
+    local map2 = {}
     for _, value in ipairs(myGraph) do
         myPos1 = myPos1 + 1
         local pushArray1 = {}
@@ -16,7 +15,7 @@ function calculate_maps(myGraph)
         if value.E ~= nil then table.insert(insideArray1, value.E) end
         if value.S ~= nil then table.insert(insideArray1, value.S) end
         table.insert(pushArray1, insideArray1)
-        table.insert(graph1, pushArray1)
+        table.insert(map1, pushArray1)
     end
 
     local myPos2 = 0
@@ -30,11 +29,18 @@ function calculate_maps(myGraph)
         if value.W ~= nil then table.insert(insideArray2, value.W) end
         if value.N ~= nil then table.insert(insideArray2, value.N) end
         table.insert(pushArray2, insideArray2)
-        table.insert(graph2, pushArray2)
+        table.insert(map2, pushArray2)
     end
+    local maps = {}
+    table.insert(maps, map1)
+    table.insert(maps, map2)
+    return maps
 end
 
-node1 = {["W"]= nil,["N"]= nil,["E"]= nil,["S"]= nil,}
+function getMap(level)
+    return gameMaps[level]
+end
+
 gameMaps = {
     {
         {["W"]= nil,["N"]= nil,["E"]= 2,["S"]= nil,}, --Position 1
@@ -92,7 +98,3 @@ gameMaps = {
     --     {["W"]= nil,["N"]= nil,["E"]= nil,["S"]= nil,}, --Position 16
     -- }
 }
-
-function getMap()
-    return gameMaps[1]
-end

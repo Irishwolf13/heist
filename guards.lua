@@ -1,12 +1,12 @@
 -- Defines the 'class' templet for Guard
 Guard = {}
 -- Define the constructor function for the Person class
-function Guard:new(floor, graph1, graph2)
+function Guard:new(floor, graph)
     local guard = {
         floor = floor,
-        graph1 = graph1,
-        graph2 = graph2,
-        speed = floor + 150,
+        graph1 = graph[1],
+        graph2 = graph[2],
+        speed = floor + 1,
         position = {},
         destination = {},
         path = {},
@@ -96,8 +96,12 @@ function Guard:moveGuard()
         if(#self.path == 1) then                            -- If Position and new destination are the same, get next destination
             self:setDestination()
             self:setGuardPath()
+            print("My Speed is " .. self.speed)
         end
     end
+    print('I am on Floor: ' .. self.floor)
+    print('My Current Position is: ' .. self.position.slot)
+    print('My Current Destination is: ' .. self.destination.slot)
 end
 
 -- Shuffles the deck of guard movements

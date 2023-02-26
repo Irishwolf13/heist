@@ -9,11 +9,17 @@ C1 = {slot=15, x=2, y=3} C2 = {slot=11, x=2, y=2} C3 = {slot=7, x=2, y=1} C4 = {
 D1 = {slot=16, x=3, y=3} D2 = {slot=12, x=3, y=2} D3 = {slot=8, x=3, y=1} D4 = {slot=4, x=3, y=0}
 
 -- Calculates the maps needed for game
-calculate_maps(getMap())
+local floor1Map = calculate_maps(getMap(1))
 
 -- Create an instance of the Guard class
-local guard1 = Guard:new(1, graph1, graph2)
+local guard1 = Guard:new(1, floor1Map)
 guard1:setPosition()
 guard1:setDestination()
 guard1:setGuardPath()
 guard1:moveGuard()
+
+local guard2 = Guard:new(2, floor1Map)
+guard2:setPosition()
+guard2:setDestination()
+guard2:setGuardPath()
+guard2:moveGuard()
