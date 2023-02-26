@@ -4,10 +4,10 @@
 
 -- Basic board layout information
 BasicBoard ={
-{slot=1, x=0, y=3}, {slot=2, x=0, y=2}, {slot=3, x=0, y=1}, {slot=4, x=0, y=0},
-{slot=5, x=1, y=3}, {slot=6, x=1, y=2}, {slot=7, x=1, y=1}, {slot=8, x=1, y=0},
-{slot=9, x=2, y=3}, {slot=10, x=2, y=2}, {slot=11, x=2, y=1}, {slot=12, x=2, y=0},
-{slot=13, x=3, y=3}, {slot=14, x=3, y=2}, {slot=15, x=3, y=1}, {slot=16, x=3, y=0}
+{slot=1, x=0, y=3, location={}}, {slot=2, x=0, y=2, location={}}, {slot=3, x=0, y=1, location={}}, {slot=4, x=0, y=0, location={}},
+{slot=5, x=1, y=3, location={}}, {slot=6, x=1, y=2, location={}}, {slot=7, x=1, y=1, location={}}, {slot=8, x=1, y=0, location={}},
+{slot=9, x=2, y=3, location={}}, {slot=10, x=2, y=2, location={}}, {slot=11, x=2, y=1, location={}}, {slot=12, x=2, y=0, location={}},
+{slot=13, x=3, y=3, location={}}, {slot=14, x=3, y=2, location={}}, {slot=15, x=3, y=1, location={}}, {slot=16, x=3, y=0, location={}}
 }
 
 function getMap(level)
