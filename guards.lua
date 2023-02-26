@@ -6,16 +6,16 @@ function Guard:new(floor, graph1, graph2)
         floor = floor,
         graph1 = graph1,
         graph2 = graph2,
-        speed = floor + 1,
+        speed = floor + 150,
         position = {},
         destination = {},
         path = {},
+        mapLookUp = {A4, B4, C4, D4, A3, B3, C3, D3, A2, B2, C2, D2, A1, B1, C1, D1},
         mapLocations = {A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4, D1, D2, D3, D4},
         mapLocationsRemaining = {}
     }
     setmetatable(guard, self)
     self.__index = self
-    -- self.shuffle()
     return guard
 end
 
@@ -24,44 +24,36 @@ function Guard:setPosition()
     if self.position.slot == nil then
         if #self.mapLocationsRemaining == 0  then
             self:shuffle()
-            print('Shuffled')
         end
         self.position = table.remove(self.mapLocationsRemaining, 1)
         print("My Position: "..self.position.slot)
     end
 end
 
--- Sets first Destination of guard from first selection of remaining locations
+-- Sets first Destination of guard
 function Guard:setDestination()
-    if self.destination.slot == nil then
-        self.destination = table.remove(self.mapLocationsRemaining, 1)
-        print("My Desitination: " .. self.destination.slot)
+    if #self.mapLocationsRemaining == 1 then
+        self:shuffle()
     end
+    self.destination = table.remove(self.mapLocationsRemaining, 1)
+    print("My Desitination: " .. self.destination.slot)
 end
 
-function Guard:findPath()
-    -- Find shortest clockwise path from Guard's position to destination
-    if (self.position.x >= self.destination.x and self.position.y >= self.destination.y)
-    or (self.position.x <= self.destination.x and self.position.y > self.destination.y) then
-        print("I took Path2")
-        self.path = self:find_shortest_path(self.graph2, self.position.slot, self.destination.slot)
+-- Sets the current path of guard to follow when moveGuard is called
+function Guard:setGuardPath()
+    local graph = {}
+    local start = self.position.slot
+    local goal = self.destination.slot
+    local pos = self.position
+    local dest = self.destination
+    if (pos.x >= dest.x and pos.y >= dest.y) or (pos.x <= dest.x and pos.y > dest.y) then
+        -- print("I took Path2")
+        graph = self.graph2
     else
-        print("I took Path1")
-        self.path = self:find_shortest_path(self.graph1, self.position.slot, self.destination.slot)
+        -- print("I took Path1")
+        graph = self.graph1
     end
-
-    -- This is for debugging only
-        for i, node in ipairs(self.path) do
-            io.write(node)
-            if i ~= #self.path then
-                io.write(" -> ")
-            end
-        end
-        print(" ")
-    -- This is for debugging only
-end
-
-function Guard:find_shortest_path(graph, start, goal)
+    -- ************** Breadth-first Search with trace retrun *************** --
     local que = {{start}}                                   -- initialize the queue with the starting node
     local visited = {[start] = true}                        -- mark the starting node as visited
     local path = {}                                         -- store the current path
@@ -72,6 +64,14 @@ function Guard:find_shortest_path(graph, start, goal)
         local node = path[#path]                            -- e.g. node = {1, {5}}
 
         if node == goal then                                -- if we've reached the goal, return the path
+            self.path = path
+            for i, node in ipairs(path) do               -- This is for debugging only
+                io.write(node)
+                if i ~= #path then
+                    io.write(" -> ")
+                end
+            end
+            print(" ")                                   -- This is for debugging only
             return path
         end
 
@@ -84,28 +84,41 @@ function Guard:find_shortest_path(graph, start, goal)
             end
         end
     end
-    return {}                                               -- if no path is found, return an empty table
 end
 
-
-
+-- Moves Guard along the path, calls setGuardPath, if he reaches destination
 function Guard:moveGuard()
     -- Create a method to move guard when called.
+    for i = 1, self.speed do
+        table.remove(self.path, 1)
+        -- MOVE GAURD HERE
+        self.position = self.mapLookUp[self.path[1]]        -- SET CURRENT POSITION HERE
+        if(#self.path == 1) then                            -- If Position and new destination are the same, get next destination
+            self:setDestination()
+            self:setGuardPath()
+        end
+    end
 end
 
-function Guard:searchRoom()
-    -- Create a method to search room when called.
-end
-
+-- Shuffles the deck of guard movements
 function Guard:shuffle()
-    local tbl = {}
+    local myTable = {}
     for i = 1, #self.mapLocations do
-        table.insert(tbl, self.mapLocations[i])
+        table.insert(myTable, self.mapLocations[i])
     end
     for i = #self.mapLocations, 2, -1 do
         local j = math.random(i)
-        tbl[i], tbl[j] = tbl[j], tbl[i]
+        myTable[i], myTable[j] = myTable[j], myTable[i]
     end
-    self.mapLocations = tbl
-    self.mapLocationsRemaining = tbl
+    self.mapLocations = myTable
+    self.mapLocationsRemaining = {}
+    for _, obj in ipairs(myTable) do
+        table.insert(self.mapLocationsRemaining, obj)
+    end
+    print("Shuffled")
+end
+
+-- Searches room for characters
+function Guard:searchRoom()
+
 end
