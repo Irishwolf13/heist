@@ -1,18 +1,20 @@
 -- Defines the 'class' templet for Guard
 Guard = {}
 -- Define the constructor function for the Person class
-function Guard:new(floor, graph)
+function Guard:new(floor, graph, myCharacter)
     local guard = {
         floor = floor,
         graph1 = graph[1],
         graph2 = graph[2],
-        speed = floor + 1,
+        speed = floor + 140,
         position = {},
         destination = {},
+        destinationVector = {},
         path = {},
         mapLookUp = {},
         mapLocations = {},
-        mapLocationsRemaining = {}
+        mapLocationsRemaining = {},
+        myCharacter = myCharacter
     }
     -- Sets static board for level
     for i, element in ipairs(BasicBoard) do
@@ -34,13 +36,13 @@ function Guard:setPosition()
             self:shuffle()
         end
         self.position = table.remove(self.mapLocationsRemaining, 1)
-        print("My Position: "..self.position.slot)
+        -- print("My Position: "..self.position.slot)
     end
 end
 
 -- Sets first Destination of guard
-function Guard:setDestination()
-    if #self.mapLocationsRemaining == 1 then
+function Guard:drawDestination()
+    if #self.mapLocationsRemaining == 0 then
         self:shuffle()
     end
     self.destination = table.remove(self.mapLocationsRemaining, 1)
@@ -64,29 +66,29 @@ function Guard:setGuardPath()
     -- ************** Breadth-first Search with trace retrun *************** --
     local que = {{start}}                                   -- initialize the queue with the starting node
     local visited = {[start] = true}                        -- mark the starting node as visited
-    local path = {}                                         -- store the current path
+    local myPath = {}                                         -- store the current myPath
 
     while #que > 0 do                                       -- #queue gives you array length
-        path = que[1]
+        myPath = que[1]
         table.remove(que, 1)
-        local node = path[#path]                            -- e.g. node = {1, {5}}
+        local node = myPath[#myPath]                            -- e.g. node = {1, {5}}
 
-        if node == goal then                                -- if we've reached the goal, return the path
-            self.path = path
-            for i, node in ipairs(path) do               -- This is for debugging only
-                io.write(node)
-                if i ~= #path then
-                    io.write(" -> ")
-                end
-            end
-            print(" ")                                   -- This is for debugging only
-            return path
+        if node == goal then                                -- if we've reached the goal, return the myPath
+            self.myPath = myPath
+            -- for i, node in ipairs(myPath) do               -- This is for debugging only
+            --     io.write(node)
+            --     if i ~= #myPath then
+            --         io.write(" -> ")
+            --     end
+            -- end
+            -- print(" ")                                   -- This is for debugging only
+            self.path = myPath
         end
 
         for _, neighbor in ipairs(graph[node][2]) do        -- Grabs the neighbors for the current node
             if not visited[neighbor] then                   -- if neighbor has not been visited
                 visited[neighbor] = true                    -- Sets current node to visited
-                local new_path = {table.unpack(path)}       -- creates new table using all values from path
+                local new_path = {table.unpack(myPath)}       -- creates new table using all values from path
                 table.insert(new_path, neighbor)            -- Magic Happens here.
                 table.insert(que, new_path)                 -- add new path to queue
             end
@@ -96,22 +98,28 @@ end
 
 -- Moves Guard along the path, calls setGuardPath, if he reaches destination
 function Guard:moveGuard()
-    -- Create a method to move guard when called.
+    timeSlot = 0
     for i = 1, self.speed do
-        table.remove(self.path, 1)
-        -- MOVE GAURD HERE
-        self.position = self.mapLookUp[self.path[1]]
-        -- CHECK ROOMS HERE
-        print("My Position is: " .. self.position.slot)
-        -- SET NEW DESTINATION IF NEEDS BE HERE
-        if(#self.path == 1) then                            -- If Position and new destination are the same, get next destination
-            self:setDestination()
-            self:setGuardPath()
-        end
+        Wait.time(function() self:move() end, timeSlot)
+        timeSlot = timeSlot + 1.5
     end
-    print('I am on Floor: ' .. self.floor)
-    print('My Current Position is: ' .. self.position.slot)
-    print('My Current Destination is: ' .. self.destination.slot)
+end
+
+function Guard:move()
+    -- print("Guard Move Started Here")
+    table.remove(self.path, 1) -- Get next Slot_id
+    -- MOVE GAURD HERE
+    basicBoardObject = self.mapLookUp[self.path[1]] -- Translate Slot_id to Basic Board Table Object
+    self.position = basicBoardObject
+    ttsObjectVector = self.position.location[1].getPosition()
+    self.destinationVector = ttsObjectVector
+    
+    self.myCharacter.setPositionSmooth(self.destinationVector + vector(0.0, 1.0, 0.0))
+    -- SET NEW DESTINATION IF NEEDS BE HERE
+    if(#self.path == 1) then                            -- If Position and new destination are the same, get next destination
+        self:drawDestination()
+        self:setGuardPath()
+    end
 end
 
 -- Shuffles the deck of guard movements
