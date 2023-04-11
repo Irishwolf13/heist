@@ -63,7 +63,7 @@ function Guard:setGuardPath()
         -- print("I took Path1")
         graph = self.graph1
     end
-    -- ************** Breadth-first Search with trace retrun *************** --
+ -- ************** Breadth-first Search with trace retrun *************** --
     local que = {{start}}                                   -- initialize the queue with the starting node
     local visited = {[start] = true}                        -- mark the starting node as visited
     local myPath = {}                                         -- store the current myPath
